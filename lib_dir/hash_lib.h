@@ -7,10 +7,14 @@
 
 #include <string>
 
-struct Table_entry {
+struct Rec {
     std::string value;
     unsigned int key;
-    unsigned short int status;
+};
+
+struct Table_entry {
+    Rec rec;
+    unsigned short int status = 0;
 };
 
 class Hash_table {
@@ -30,15 +34,14 @@ class Hash_table {
 public:
     Hash_table(unsigned int size);
 
-    void add(unsigned int key, std::string value);
+    void add(Rec rec);
 
-    void del(unsigned int key, std::string value);
+    void del(Rec rec);
 
-    long search(unsigned int index, std::string value);
+    long search(Rec rec);
 
     void pringAll();
 
-    void printForKey(unsigned int key);
 
     unsigned int getCount();
 

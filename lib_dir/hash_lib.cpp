@@ -8,12 +8,9 @@
 #define noEntry -1
 
 Hash_table::Hash_table(unsigned int size) {
-    table = new Table_entry[size];
+    this->table = new Table_entry[size];
     this->size = size;
     this->count = 0;
-    for (int i = 0; i < size; i++) {
-        table[i].status = 0;
-    }
 }
 
 unsigned int Hash_table::hash1(unsigned int key) {
@@ -24,27 +21,34 @@ unsigned int Hash_table::hash2(unsigned int key) {
     return (key + hashParam);
 }
 
-long Hash_table::search(unsigned int key, std::string value) {
-    unsigned int hashValue = hash1(key);
+long Hash_table::search(Rec rec) {
+    unsigned int hashValue = hash1(rec.key);
     if (table[hashValue].status == 0) {
         return noEntry;
+    } else if (table[hashValue].status == 1 && table[hashValue].rec.key == rec.key) {
+        return (hashValue);
     } else {
-        while (table[hashValue].status != 0 && table[hashValue].key != key && hash2(hashValue) < size) {
+        while (table[hashValue].status != 0 && hash2(hashValue) < size) {
             hashValue = hash2(hashValue);
+            if (table[hashValue].status == 1 && table[hashValue].rec.key == rec.key) {
+                return (hashValue);
+            }
         }
-        if (hash2(hashValue) >= size) {
+        if (hash2(hashValue) >= size || table[hashValue].status == 0) {
             return noEntry;
         }
-        return (hashValue);
     }
 }
 
-void Hash_table::add(unsigned int key, std::string value) {
-    unsigned int hashValue = hash1(key);
+void Hash_table::add(Rec rec) {
+    if ((float) count / (float) size > full) {
+        extend();
+    }
+    unsigned int hashValue = hash1(rec.key);
     if (table[hashValue].status == 0 || table[hashValue].status == 2) {
         table[hashValue].status = 1;
-        table[hashValue].key = key;
-        table[hashValue].value = value;
+        table[hashValue].rec.key = rec.key;
+        table[hashValue].rec.value = rec.value;
         count++;
     } else {
         while (table[hashValue].status == 1 && hash2(hashValue) < size) {
@@ -52,18 +56,18 @@ void Hash_table::add(unsigned int key, std::string value) {
         }
         if (hashValue < size) {
             table[hashValue].status = 1;
-            table[hashValue].key = key;
-            table[hashValue].value = value;
+            table[hashValue].rec.key = rec.key;
+            table[hashValue].rec.value = rec.value;
             count++;
         } else {
             extend();
-            add(key, value);
+            add(rec);
         }
     }
 }
 
-void Hash_table::del(unsigned int key, std::string value) {
-    long hashValue = search(key, value);
+void Hash_table::del(Rec rec) {
+    long hashValue = search(rec);
     if (hashValue > -1) {
         table[hashValue].status = 2;
         count--;
@@ -73,25 +77,31 @@ void Hash_table::del(unsigned int key, std::string value) {
 void Hash_table::extend() {
     unsigned int newSize = size * 2;
     Table_entry *tmpTable = table;
-    Table_entry *newTable = new Table_entry[newSize];
+    auto *newTable = new Table_entry[newSize];
     this->table = newTable;
-    for (unsigned int i = 0; i < newSize; i++) {
-        table[i].status = 0;
-    }
-    for (unsigned int i = 0; i < size; i++) {
-        if (table[i].status == 1) {
-            add(table[i].key, table[i].value);
+    this->size = newSize;
+    this->count = 0;
+    for (unsigned int i = 0; i < size/2; i++) {
+        if (tmpTable[i].status == 1) {
+            add(tmpTable[i].rec);
         }
     }
-    this->size = newSize;
 }
 
 void Hash_table::pringAll() {
-    for (unsigned int i = 0; i < size; i++){
-        if (table[i].status == 1){
-            std:: cout << i << '\t' << table[i].key << '\t' << table[i].value << std::endl;
+    if (count > 0) {
+        for (unsigned int i = 0; i < size; i++) {
+            if (table[i].status == 1) {
+                std::cout << i << '\t' << table[i].rec.key << '\t' << table[i].rec.value << std::endl;
+            }
         }
+    } else {
+        std::cout << "Таблица пуста" << std::endl;
     }
+    for (int i = 0; i < 15; i++) {
+        std::cout << "-";
+    }
+    std::cout << std::endl;
 }
 
 unsigned int Hash_table::getCount() {
