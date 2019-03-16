@@ -19,29 +19,30 @@ struct Table_entry {
 
 class Hash_table {
     const float full = 0.75;
-    const unsigned short int hashParam = 3;
+    unsigned short int hashParam;
     unsigned int count;
     unsigned int size;
 
     Table_entry *table;
 
-    unsigned int hash1(unsigned int key);
+    unsigned int hash1(unsigned int &key);
 
-    unsigned int hash2(unsigned int key);
+    unsigned int hash2(unsigned int &key);
 
     void extend();
 
+    Table_entry *searchEntry(Rec &rec);
+
 public:
-    Hash_table(unsigned int size);
+    Hash_table(unsigned int size, unsigned short int hashParam);
 
-    void add(Rec rec);
+    short add(Rec &rec);
 
-    void del(Rec rec);
+    short del(Rec &rec);
 
-    long search(Rec rec);
+    long search(Rec &rec);
 
     void pringAll();
-
 
     unsigned int getCount();
 
