@@ -11,7 +11,7 @@
 #define success 0
 
 TEST_CASE("Base", "[hash]") {
-    Hash_table MyTable(10, 3);
+    Hash_table MyTable(10, 2);
     Rec MyRec;
     MyRec.key = 100123;
     MyRec.value = "Мурзилка";

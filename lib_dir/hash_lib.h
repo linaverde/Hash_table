@@ -18,7 +18,8 @@ struct Table_entry {
 };
 
 class Hash_table {
-    const float full = 0.75;
+    const float full = 0.8;
+    const float empty = 0.2;
     unsigned short int hashParam;
     unsigned int count;
     unsigned int size;
@@ -29,7 +30,7 @@ class Hash_table {
 
     unsigned int hash2(unsigned int &key);
 
-    void extend();
+    void extend(char c);
 
     Table_entry *searchEntry(Rec &rec);
 

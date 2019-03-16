@@ -3,21 +3,28 @@
 //
 
 #include <iostream>
+#include <cmath>
 #include "hash_lib.h"
 
 #define fail -1
 #define success 0
+#define bigger 'b'
+#define smaller 's'
+#define minSize 10
+
+unsigned short int setHashParam(unsigned int size, unsigned short int param) {
+    param %= size;
+    if (param == 0 || size % param == 0) {
+        return (param + 1);
+    }
+    return param;
+}
 
 Hash_table::Hash_table(unsigned int size, unsigned short int hashParam) {
     this->table = new Table_entry[size];
     this->size = size;
     this->count = 0;
-    hashParam %= size;
-    if (hashParam == 0 || size % hashParam == 0){
-        this->hashParam = hashParam + 1;
-    } else {
-        this->hashParam = hashParam;
-    }
+    this->hashParam = setHashParam(size, hashParam);
 }
 
 unsigned int Hash_table::hash1(unsigned int &key) {
@@ -62,11 +69,12 @@ long Hash_table::search(Rec &rec) {
             return fail;
         }
     }
+    return fail;
 }
 
 short Hash_table::add(Rec &rec) {
     if ((float) count / (float) size > full) {
-        extend();
+        extend(bigger);
     }
     Table_entry *addPlace = searchEntry(rec);
     if (addPlace->status == 1) {
@@ -85,23 +93,28 @@ short Hash_table::del(Rec &rec) {
     if (hashValue != fail && table[hashValue].rec.value == rec.value) {
         table[hashValue].status = 2;
         count--;
+        if (size > minSize && (float) count / (float) size < empty) {
+            extend(smaller);
+        }
         return success;
     }
     return fail;
 }
 
-void Hash_table::extend() {
-    unsigned int newSize = size * 2;
+void Hash_table::extend(char c) {
+    unsigned int newSize = size;
+    c == bigger ? newSize *= 2 : newSize /= 2;
     Table_entry *tmpTable = table;
     auto *newTable = new Table_entry[newSize];
     this->table = newTable;
-    this->size = newSize;
+    std::swap(this->size, newSize);
     this->count = 0;
-    for (unsigned int i = 0; i < size / 2; i++) {
+    for (unsigned int i = 0; i < newSize; i++) {
         if (tmpTable[i].status == 1) {
             add(tmpTable[i].rec);
         }
     }
+    this->hashParam = setHashParam(size, hashParam);
     delete[] tmpTable;
 }
 
