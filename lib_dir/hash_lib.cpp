@@ -109,12 +109,12 @@ void Hash_table::extend(char c) {
     this->table = newTable;
     std::swap(this->size, newSize);
     this->count = 0;
+    this->hashParam = setHashParam(size, hashParam);
     for (unsigned int i = 0; i < newSize; i++) {
         if (tmpTable[i].status == 1) {
             add(tmpTable[i].rec);
         }
     }
-    this->hashParam = setHashParam(size, hashParam);
     delete[] tmpTable;
 }
 
