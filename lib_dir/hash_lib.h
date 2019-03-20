@@ -32,6 +32,8 @@ class Hash_table {
 
     void extend(char c);
 
+    unsigned short int setHashParam(unsigned int size, unsigned short int param);
+
     Table_entry *searchEntry(Rec &rec);
 
 public:

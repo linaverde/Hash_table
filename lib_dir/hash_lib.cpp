@@ -12,11 +12,22 @@
 #define smaller 's'
 #define minSize 10
 
-unsigned short int setHashParam(unsigned int size, unsigned short int param) {
-    param %= size;
-    if (param == 0 || size % param == 0) {
-        return (param + 1);
-    }
+unsigned short int Hash_table::setHashParam(unsigned int size, unsigned short int param) {
+    static unsigned short int i;
+    do {
+        if (param == size) {
+            return 1;
+        }
+        for (i = param; i > 1; i--) {
+            if (size % i == 0 && param % i == 0) {
+                if (i != 1) {
+                    break;
+                }
+            }
+        }
+        param++;
+    } while (i != 1);
+    param--;
     return param;
 }
 
@@ -64,9 +75,6 @@ long Hash_table::search(Rec &rec) {
             if (table[hashValue].status == 1 && table[hashValue].rec.key == rec.key) {
                 return (hashValue);
             }
-        }
-        if (hash2(hashValue) >= size || table[hashValue].status == 0) {
-            return fail;
         }
     }
     return fail;
@@ -119,6 +127,7 @@ void Hash_table::extend(char c) {
 }
 
 void Hash_table::pringAll() {
+    std::cout << "Параметр функции хеш: " << hashParam << std::endl;
     if (count > 0) {
         for (unsigned int i = 0; i < size; i++) {
             if (table[i].status == 1) {
